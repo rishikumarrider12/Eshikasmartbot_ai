@@ -123,11 +123,11 @@ async function sendMessage() {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${API_KEY}`,
-        'HTTP-Referer': window.location.href,
+        'Referer': window.location.href,
         'X-Title': 'Eshika SmartBot AI'
       },
       body: JSON.stringify({
-        model: 'openai/gpt-3.5-turbo',
+        model: 'google/gemini-2.0-flash-lite-preview-02-05:free',
         messages: [
           {
             role: 'system',
