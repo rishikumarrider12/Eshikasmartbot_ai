@@ -114,8 +114,11 @@ async function sendMessage() {
       chatHistory.push({ role: 'model', parts: [{ text: botResponse }] });
       addMessage(botResponse, false);
       speak(botResponse);
+    } else if (data.error) {
+      // Show the specific error from the server
+      addMessage(`**Backend Error:** ${data.error}`, false);
     } else {
-      addMessage("I encountered an issue. Please check your internet or API configuration.", false);
+      addMessage("I encountered an unexpected response. Please check your Vercel logs.", false);
     }
   } catch (err) {
     typingIndicator.style.display = 'none';
