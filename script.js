@@ -132,8 +132,9 @@ async function sendMessage() {
       addMessage(botResponse, false);
       speak(botResponse);
     } else if (data.error) {
-      // Show the specific error from the server
-      addMessage(`**Backend Error:** ${data.error}`, false);
+      // Show the specific error from the server (handled as object or string)
+      const errorMsg = typeof data.error === 'object' ? JSON.stringify(data.error) : data.error;
+      addMessage(`**Backend Error:** ${errorMsg}`, false);
     } else {
       addMessage("I encountered an unexpected response. Please check your Vercel logs.", false);
     }
