@@ -124,26 +124,27 @@ body {
 }
 
 .message {
-    max-width: 80%;
-    padding: 14px 20px;
+    max-width: 85%;
+    padding: 16px 22px;
     border-radius: 18px;
-    line-height: 1.6;
+    line-height: 1.7;
     font-size: 0.95rem;
-    animation: fadeIn 0.3s ease-out forwards;
+    animation: slideIn 0.35s ease-out forwards;
     position: relative;
+    word-wrap: break-word;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(12px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .user-message {
     align-self: flex-end;
-    background: var(--accent-color);
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
     color: white;
     border-bottom-right-radius: 4px;
-    box-shadow: 0 4px 15px var(--accent-glow);
+    box-shadow: 0 4px 18px rgba(59, 130, 246, 0.3);
 }
 
 .bot-message {
@@ -151,7 +152,99 @@ body {
     background: var(--bot-bubble);
     border: 1px solid var(--glass-border);
     border-bottom-left-radius: 4px;
-    color: white;
+    color: var(--text-main);
+    backdrop-filter: blur(10px);
+}
+
+/* Typing cursor animation */
+.bot-message.typing-active::after {
+    content: '▋';
+    animation: blink 0.6s infinite;
+    color: var(--accent-color);
+    font-weight: bold;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.bot-message.typing-done {
+    animation: glow-once 0.4s ease-out;
+}
+
+@keyframes glow-once {
+    0% { box-shadow: 0 0 15px var(--accent-glow); }
+    100% { box-shadow: none; }
+}
+
+/* ─── Bot Message Markdown Styling ─── */
+.bot-message h1, .bot-message h2, .bot-message h3 {
+    margin: 10px 0 6px;
+    color: #60a5fa;
+    font-weight: 700;
+}
+.bot-message h1 { font-size: 1.15rem; }
+.bot-message h2 { font-size: 1.05rem; }
+.bot-message h3 { font-size: 0.98rem; }
+
+.bot-message p {
+    margin: 4px 0;
+}
+
+.bot-message ul, .bot-message ol {
+    margin: 6px 0;
+    padding-left: 20px;
+}
+
+.bot-message li {
+    margin: 3px 0;
+}
+
+.bot-message code {
+    background: rgba(255, 255, 255, 0.08);
+    padding: 2px 6px;
+    border-radius: 5px;
+    font-size: 0.88rem;
+    font-family: 'Fira Code', 'Consolas', monospace;
+    color: #fbbf24;
+}
+
+.bot-message pre {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    overflow-x: auto;
+    margin: 8px 0;
+}
+
+.bot-message pre code {
+    background: none;
+    padding: 0;
+    color: #e2e8f0;
+}
+
+.bot-message blockquote {
+    border-left: 3px solid var(--accent-color);
+    margin: 8px 0;
+    padding: 4px 12px;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.bot-message strong {
+    color: #93c5fd;
+}
+
+.bot-message a {
+    color: #60a5fa;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.bot-message a:hover {
+    color: #93c5fd;
 }
 
 .input-panel {
@@ -195,16 +288,59 @@ textarea:focus {
     background: rgba(255, 255, 255, 0.1);
 }
 
+#send-btn, #voice-input-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
 #send-btn {
     color: var(--accent-color);
-    font-size: 1.5rem;
+}
+
+#voice-input-btn {
+    color: var(--text-muted);
+}
+
+#send-btn:hover, #voice-input-btn:hover {
+    transform: scale(1.15);
+    filter: brightness(1.3);
+}
+
+.voice-active {
+    color: #ef4444 !important;
+    animation: pulse-voice 1s infinite;
+}
+
+@keyframes pulse-voice {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
 }
 
 .typing-indicator {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     color: var(--text-muted);
-    padding: 0 40px 10px;
+    padding: 8px 40px;
     display: none;
+    align-items: center;
+    gap: 8px;
+}
+
+.typing-indicator::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: var(--accent-color);
+    border-radius: 50%;
+    animation: pulse-dot 1s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.4); opacity: 1; }
 }
 
 /* Splash Screen */
