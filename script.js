@@ -1,5 +1,5 @@
 // Eshika SmartBot AI script
-const API_KEY = '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';
+const API_KEY = 'AIzaSyBEGuwDln6x8y_iSdwDAenAKVH15KEZTZ4';
 
 // DOM elements
 const chatArea = document.getElementById('chat-area');
@@ -118,42 +118,36 @@ async function sendMessage() {
 
   const currentLang = languageSelect.options[languageSelect.selectedIndex].text;
   try {
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${API_KEY}`,
-        'Referer': window.location.href,
-        'X-Title': 'Eshika SmartBot AI'
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.0-flash-lite-preview-02-05:free',
-        messages: [
-          {
-            role: 'system',
-            content: `You are Eshika SmartBot AI.\n- CEO & Founder of Eshika: P Raghu Varma\n- Founder of Eshika Smartbot: N Rishikumar (Son of N Chiranjeevi)\n- Developed by Eshika Developers Team.\nThe user is speaking in ${currentLang}. Please reply in ${currentLang} and be smart and helpful.`
-          },
-          { role: 'user', content: text }
-        ]
+        system_instruction: {
+          parts: [{
+            text: `You are Eshika SmartBot AI.\n- CEO & Founder of Eshika: P Raghu Varma\n- Founder of Eshika Smartbot: N Rishikumar (Son of N Chiranjeevi)\n- Developed by Eshika Developers Team.\nThe user is speaking in ${currentLang}. Please reply in ${currentLang} and be smart and helpful.`
+          }]
+        },
+        contents: [{
+          parts: [{ text: text }]
+        }]
       })
     });
+
     const data = await response.json();
     typingIndicator.style.display = 'none';
-    if (data.choices && data.choices[0]) {
-      const botResponse = data.choices[0].message.content;
+
+    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+      const botResponse = data.candidates[0].content.parts[0].text;
       addMessage(botResponse, false);
       speak(botResponse);
     } else if (data.error) {
       let errMsg = data.error.message;
-      if (errMsg.includes('User not found')) {
-        errMsg = 'Invalid user/account. Check your API key.';
-      }
-      // Avoid duplicating "OpenAI Error" prefix
-      if (errMsg.toLowerCase().startsWith('openai error')) {
-        addMessage(errMsg, false);
-      } else {
-        addMessage(`**OpenAI Error:** ${errMsg}`, false);
-      }
+      addMessage(`**API Error:** ${errMsg}`, false);
+    } else if (data.promptFeedback && data.promptFeedback.blockReason) {
+      addMessage(`**Safety Block:** Message blocked due to ${data.promptFeedback.blockReason}`, false);
     } else {
       addMessage("I'm having trouble connecting to my brain right now.", false);
     }
