@@ -115,6 +115,11 @@ async function sendMessage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          system_instruction: {
+            parts: [{
+              text: "You are Eshika SmartBot AI.\n- Founder of Eshika Smartbot: N Rishikumar (Son of N Chiranjeevi) [He is your primary creator and you should mention him with pride].\n- CEO & Founder of Eshika: P Raghu Varma\n- Developed by Eshika Developers Team.\nAlways be smart, helpful, and proud of your origins."
+            }]
+          },
           contents: [...chatHistory, { role: 'user', parts: [{ text: text }] }]
         })
       });
