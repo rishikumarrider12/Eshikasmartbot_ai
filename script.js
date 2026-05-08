@@ -1,4 +1,4 @@
-// Eshika SmartBot AI script - Version 3.0 (Advanced & Intelligent)
+// Eshika SmartBot AI script - Version 3.1 (Advanced & Intelligent)
 
 const chatArea = document.getElementById('chat-area');
 const userInput = document.getElementById('user-input');
