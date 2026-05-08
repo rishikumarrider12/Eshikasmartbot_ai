@@ -100,8 +100,16 @@ async function sendMessage() {
   try {
     let response;
     if (isLocal) {
-      // Local fallback: Call Google directly (using the key we had before for testing)
-      const LOCAL_KEY = 'AIzaSyDH2WiY_7iFmSV4OOdBrUHA4T_asVNLZTo';
+      // Local testing: You can paste your key here temporarily for local testing, 
+      // but NEVER commit it to GitHub!
+      const LOCAL_KEY = ''; // PASTE_YOUR_KEY_HERE_FOR_LOCAL_ONLY
+      
+      if (!LOCAL_KEY) {
+        addMessage("Please add your API key to `script.js` for local testing. (Do not commit it!)", false);
+        typingIndicator.style.display = 'none';
+        return;
+      }
+
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${LOCAL_KEY}`;
       response = await fetch(url, {
         method: 'POST',
