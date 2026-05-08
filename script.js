@@ -95,15 +95,32 @@ async function sendMessage() {
   userInput.style.height = 'auto';
   typingIndicator.style.display = 'block';
 
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:';
+  
   try {
-    const response = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message: text,
-        history: chatHistory
-      })
-    });
+    let response;
+    if (isLocal) {
+      // Local fallback: Call Google directly (using the key we had before for testing)
+      const LOCAL_KEY = 'AIzaSyDH2WiY_7iFmSV4OOdBrUHA4T_asVNLZTo';
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${LOCAL_KEY}`;
+      response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [...chatHistory, { role: 'user', parts: [{ text: text }] }]
+        })
+      });
+    } else {
+      // Production: Call the secure serverless backend
+      response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: text,
+          history: chatHistory
+        })
+      });
+    }
 
     const data = await response.json();
     typingIndicator.style.display = 'none';
