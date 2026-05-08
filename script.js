@@ -102,7 +102,7 @@ async function sendMessage() {
     if (isLocal) {
       // Local fallback: Call Google directly (using the key we had before for testing)
       const LOCAL_KEY = 'AIzaSyDH2WiY_7iFmSV4OOdBrUHA4T_asVNLZTo';
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${LOCAL_KEY}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${LOCAL_KEY}`;
       response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
