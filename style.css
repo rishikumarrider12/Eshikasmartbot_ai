@@ -76,7 +76,18 @@ body {
     font-size: 0.75rem;
     color: var(--text-muted);
     text-align: right;
-    line-height: 1.2;
+    line-height: 1.4;
+}
+
+.founder-highlight {
+    font-size: 1.1rem;
+    color: #fbbf24 !important; /* Gold/Amber color */
+    text-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
+    margin-top: 10px;
+}
+
+.founder-tag strong {
+    color: #fbbf24;
 }
 
 .splash-credits {

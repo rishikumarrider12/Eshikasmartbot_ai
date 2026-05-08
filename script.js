@@ -1,5 +1,4 @@
-// Eshika SmartBot AI script
-const API_KEY = 'AIzaSyBEGuwDln6x8y_iSdwDAenAKVH15KEZTZ4';
+// Eshika SmartBot AI script - Version 2.0 (Secure & Intelligent)
 
 // DOM elements
 const chatArea = document.getElementById('chat-area');
@@ -17,6 +16,7 @@ let isListening = false;
 let isMuted = false;
 let recognition = null;
 let voices = [];
+let chatHistory = []; // Conversation memory
 
 // Load speech synthesis voices
 function loadVoices() {
@@ -25,12 +25,11 @@ function loadVoices() {
 window.speechSynthesis.onvoiceschanged = loadVoices;
 loadVoices();
 
-// Initialize Speech Recognition if supported
+// Initialize Speech Recognition
 if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   recognition = new SpeechRecognition();
   recognition.continuous = false;
-  recognition.interimResults = false;
   recognition.lang = languageSelect.value;
 
   recognition.onstart = () => {
@@ -50,115 +49,94 @@ if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
   };
 }
 
-// Update language for recognition and synthesis
 languageSelect.addEventListener('change', () => {
   if (recognition) recognition.lang = languageSelect.value;
 });
 
-// Voice gender selection – handled in speak()
-voiceSelect.addEventListener('change', () => {});
-
-// Mute toggle
 muteBtn.addEventListener('click', () => {
   isMuted = !isMuted;
   muteBtn.textContent = isMuted ? '🔇' : '🔊';
   if (isMuted) window.speechSynthesis.cancel();
 });
 
-// Speech synthesis helper
 function speak(text) {
   if (isMuted) return;
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = languageSelect.value;
-  const gender = voiceSelect.value; // 'male' or 'female'
+  const gender = voiceSelect.value;
   
-  // Try to find a voice that matches language and gender
   const filtered = voices.filter(v => v.lang.startsWith(languageSelect.value.split('-')[0]));
   if (filtered.length) {
     let selected = filtered.find(v => v.name.toLowerCase().includes(gender));
     if (!selected) selected = filtered[0];
     utterance.voice = selected;
   }
-  
-  utterance.rate = 1.0;
-  utterance.pitch = 1.0;
   window.speechSynthesis.speak(utterance);
 }
 
-// Add message bubble to chat UI
 function addMessage(text, isUser = false) {
-  // Suppress duplicate OpenAI error messages
-  if (!isUser && text.includes('OpenAI Error')) {
-    const last = chatArea.lastElementChild;
-    if (last && last.classList.contains('bot-message') && last.textContent.includes('OpenAI Error')) {
-      console.warn('Duplicate OpenAI error suppressed');
-      return;
-    }
-  }
   const msgDiv = document.createElement('div');
   msgDiv.classList.add('message');
   msgDiv.classList.add(isUser ? 'user-message' : 'bot-message');
+  
   if (isUser) {
     msgDiv.textContent = text;
   } else {
     msgDiv.innerHTML = marked.parse(text);
   }
+  
   chatArea.appendChild(msgDiv);
   chatArea.scrollTop = chatArea.scrollHeight;
 }
 
-// Send message to OpenRouter (OpenAI) backend
 async function sendMessage() {
   const text = userInput.value.trim();
   if (!text) return;
+
   addMessage(text, true);
   userInput.value = '';
   userInput.style.height = 'auto';
   typingIndicator.style.display = 'block';
 
-  const currentLang = languageSelect.options[languageSelect.selectedIndex].text;
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
-    const response = await fetch(url, {
+    // Call the serverless function instead of Google directly
+    const response = await fetch('/api/chat', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        system_instruction: {
-          parts: [{
-            text: `You are Eshika SmartBot AI.\n- CEO & Founder of Eshika: P Raghu Varma\n- Founder of Eshika Smartbot: N Rishikumar (Son of N Chiranjeevi)\n- Developed by Eshika Developers Team.\nThe user is speaking in ${currentLang}. Please reply in ${currentLang} and be smart and helpful.`
-          }]
-        },
-        contents: [{
-          parts: [{ text: text }]
-        }]
+        message: text,
+        history: chatHistory
       })
     });
 
     const data = await response.json();
     typingIndicator.style.display = 'none';
 
-    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+    if (data.candidates && data.candidates[0]) {
       const botResponse = data.candidates[0].content.parts[0].text;
+      
+      // Update local history
+      chatHistory.push({ role: 'user', parts: [{ text: text }] });
+      chatHistory.push({ role: 'model', parts: [{ text: botResponse }] });
+
       addMessage(botResponse, false);
       speak(botResponse);
-    } else if (data.error) {
-      let errMsg = data.error.message;
-      addMessage(`**API Error:** ${errMsg}`, false);
-    } else if (data.promptFeedback && data.promptFeedback.blockReason) {
-      addMessage(`**Safety Block:** Message blocked due to ${data.promptFeedback.blockReason}`, false);
     } else {
-      addMessage("I'm having trouble connecting to my brain right now.", false);
+      addMessage("I encountered an issue. Please check your internet or API configuration.", false);
     }
   } catch (err) {
-    console.error(err);
     typingIndicator.style.display = 'none';
-    addMessage('Error: Failed to fetch response. Check API key or connection.', false);
+    addMessage('Error: Failed to connect to server. Ensure you are running on Vercel.', false);
   }
 }
 
-// Event listeners
+// Clear Chat Functionality
+function clearChat() {
+  chatArea.innerHTML = '';
+  chatHistory = [];
+  addMessage("Chat history cleared. How can I help you now?", false);
+}
+
 sendBtn.addEventListener('click', sendMessage);
 userInput.addEventListener('keydown', e => {
   if (e.key === 'Enter' && !e.shiftKey) {
@@ -166,29 +144,22 @@ userInput.addEventListener('keydown', e => {
     sendMessage();
   }
 });
+
 voiceBtn.addEventListener('click', () => {
-  if (!recognition) { alert('Speech recognition not supported in this browser.'); return; }
+  if (!recognition) { alert('Speech recognition not supported.'); return; }
   if (isListening) recognition.stop(); else recognition.start();
 });
 
-// Auto-resize textarea
 userInput.addEventListener('input', function () {
   this.style.height = 'auto';
   this.style.height = this.scrollHeight + 'px';
 });
 
-// Splash screen handling – stays until Get Started is clicked
 getStartedBtn.addEventListener('click', () => {
   splashScreen.classList.add('splash-hidden');
-  // Speak welcome message when starting
   setTimeout(() => {
-    const welcomeMsg = "Hello! I am Eshika SmartBot AI, your intelligent multilingual companion. I was founded by N Rishikumar and led by CEO P Raghu Varma. How can I help you today?";
+    const welcomeMsg = "Hello! I am Eshika SmartBot AI, your intelligent multilingual companion. Founded by N Rishikumar (Son of N Chiranjeevi). How can I help you today?";
     addMessage(welcomeMsg, false);
     speak(welcomeMsg);
   }, 500);
 });
-
-// Initial setup
-window.onload = () => {
-  // Initial setup if needed
-};
