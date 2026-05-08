@@ -1,6 +1,5 @@
 // Eshika SmartBot AI script - Version 2.0 (Secure & Intelligent)
 
-// DOM elements
 const chatArea = document.getElementById('chat-area');
 const userInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
@@ -16,16 +15,14 @@ let isListening = false;
 let isMuted = false;
 let recognition = null;
 let voices = [];
-let chatHistory = []; // Conversation memory
+let chatHistory = [];
 
-// Load speech synthesis voices
 function loadVoices() {
   voices = window.speechSynthesis.getVoices();
 }
 window.speechSynthesis.onvoiceschanged = loadVoices;
 loadVoices();
 
-// Initialize Speech Recognition
 if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   recognition = new SpeechRecognition();
@@ -99,7 +96,6 @@ async function sendMessage() {
   typingIndicator.style.display = 'block';
 
   try {
-    // Call the serverless function instead of Google directly
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -114,11 +110,8 @@ async function sendMessage() {
 
     if (data.candidates && data.candidates[0]) {
       const botResponse = data.candidates[0].content.parts[0].text;
-      
-      // Update local history
       chatHistory.push({ role: 'user', parts: [{ text: text }] });
       chatHistory.push({ role: 'model', parts: [{ text: botResponse }] });
-
       addMessage(botResponse, false);
       speak(botResponse);
     } else {
@@ -130,7 +123,6 @@ async function sendMessage() {
   }
 }
 
-// Clear Chat Functionality
 function clearChat() {
   chatArea.innerHTML = '';
   chatHistory = [];
