@@ -3,6 +3,13 @@ import { NextResponse } from 'next/server'
 
 export async function middleware(req) {
   const res = NextResponse.next()
+  
+  // Safety check for environment variables
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    console.warn('Supabase environment variables are missing. Middleware bypassed.')
+    return res
+  }
+
   const supabase = createMiddlewareClient({ req, res })
 
   const {
