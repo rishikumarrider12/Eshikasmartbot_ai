@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://eshikasmartbot-ai.vercel.app/sitemap.xml
