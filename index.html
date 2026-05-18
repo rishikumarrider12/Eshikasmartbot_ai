@@ -6,12 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Eshika SmartBot AI</title>
   <link rel="icon" type="image/png" href="logo.png" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <!-- Marked parser for bot markdown responses -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- Lucide Icons CDN for beautiful modern icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
 <body>
+  <!-- ─── Splash Screen ─── -->
   <div id="splash-screen" class="splash-screen">
     <div class="splash-content">
       <img src="logo.png" alt="Eshika Logo" class="splash-logo" />
@@ -19,71 +23,372 @@
       <p class="splash-subtitle">Your Intelligent Multilingual Companion</p>
       <div class="splash-credits">
         <p><strong>CEO & Founder of Eshika:</strong> P Raghu Varma</p>
-        <p class="founder-highlight"><strong>Founder of Eshika Smartbot:</strong> N Rishikumar (Son of N Chiranjeevi)
-        </p>
+        <p class="founder-highlight"><strong>Founder of Eshika Smartbot:</strong> N Rishikumar (Son of N Chiranjeevi)</p>
         <p><em>Developed by Eshika Developers Team</em></p>
-        <a href="https://rishiriderportfolio.netlify.app/" target="_blank" class="contact-dev-link">👨‍💻 Contact
-          Developer</a>
+        <a href="https://rishiriderportfolio.netlify.app/" target="_blank" class="contact-dev-link">👨‍💻 Contact Developer</a>
       </div>
       <button id="get-started-btn" class="get-started-btn">Get Started</button>
     </div>
   </div>
 
-  <div class="app-container">
-    <header class="header">
-      <div class="header-left">
-        <img src="logo.png" alt="Logo" class="bot-logo" />
-        <h1>Eshika AI</h1>
+  <!-- ─── Sidebar Mobile Overlay ─── -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- ─── Main App Container ─── -->
+  <div class="app-wrapper">
+    <!-- Collapsible Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <img src="logo.png" alt="Eshika Logo" class="sidebar-logo" />
+          <span class="sidebar-title">Eshika AI</span>
+        </div>
+        <button class="sidebar-close" id="sidebar-close-btn">
+          <i data-lucide="x"></i>
+        </button>
       </div>
-      <div class="header-right">
-        <select id="language-select" class="control-btn">
-          <option value="en-US">English</option>
-          <option value="te-IN">Telugu (తెలుగు)</option>
-          <option value="hi-IN">Hindi (हिन्दी)</option>
-          <option value="ta-IN">Tamil (தமிழ்)</option>
-          <option value="kn-IN">Kannada (ಕನ್ನಡ)</option>
-          <option value="ml-IN">Malayalam (മലയാളം)</option>
-          <option value="bn-IN">Bengali (বাংলা)</option>
-          <option value="mr-IN">Marathi (మరాठी)</option>
-          <option value="gu-IN">Gujarati (ગુજરાતી)</option>
-          <option value="pa-IN">Punjabi (ਪੰਜਾਬੀ)</option>
-          <option value="ur-PK">Urdu (اردو)</option>
-          <option value="fr-FR">French (Français)</option>
-          <option value="es-ES">Spanish (Español)</option>
-          <option value="de-DE">German (Deutsch)</option>
-          <option value="it-IT">Italian (Italiano)</option>
-          <option value="pt-BR">Portuguese (Português)</option>
-          <option value="ru-RU">Russian (Русский)</option>
-          <option value="zh-CN">Chinese (简体中文)</option>
-          <option value="ja-JP">Japanese (日本語)</option>
-          <option value="ko-KR">Korean (한국어)</option>
-          <option value="ar-SA">Arabic (العربية)</option>
-          <option value="tr-TR">Turkish (Türkçe)</option>
-          <option value="vi-VN">Vietnamese (Tiếng Việt)</option>
-          <option value="th-TH">Thai (ไทย)</option>
-          <option value="id-ID">Indonesian (Bahasa Indonesia)</option>
-        </select>
-        <select id="voice-select" class="control-btn">
-          <option value="female">Female</option>
-          <option value="male">Male</option>
-        </select>
-        <button onclick="clearChat()" class="control-btn" title="Clear Chat">🗑️</button>
-        <button id="mute-btn" class="control-btn">🔊</button>
-        <a href="https://rishiriderportfolio.netlify.app/" target="_blank" class="control-btn contact-dev-btn"
-          title="Contact Developer">👨‍💻 Dev</a>
-        <div class="tagline">
-          <p class="founder-tag">Founder: <strong>N Rishikumar (Son of N Chiranjeevi)</strong></p>
+
+      <!-- New Chat Action -->
+      <button class="new-chat-btn" id="new-chat-btn">
+        <i data-lucide="plus"></i> New Chat
+      </button>
+
+      <!-- Sidebar Dynamic Menu -->
+      <div class="sidebar-menu">
+        <div class="menu-section">
+          <div class="menu-section-title">Recent Chats</div>
+          <div class="recent-chats-list" id="recent-chats-list">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <div class="menu-section">
+          <div class="menu-section-title">Navigation</div>
+          <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-page="home">
+              <i data-lucide="message-square"></i> Home (Chat)
+            </a>
+            <a href="#" class="nav-item" data-page="profile">
+              <i data-lucide="user"></i> Profile
+            </a>
+            <a href="#" class="nav-item" data-page="settings">
+              <i data-lucide="settings"></i> Settings
+            </a>
+            <a href="#" class="nav-item" data-page="about">
+              <i data-lucide="info"></i> About
+            </a>
+          </nav>
         </div>
       </div>
-    </header>
-    <main class="chat-area" id="chat-area"></main>
-    <div id="typing-indicator" class="typing-indicator">Eshika is thinking...</div>
-    <div class="input-panel">
-      <textarea id="user-input" rows="1" placeholder="Type your message..."></textarea>
-      <button id="send-btn">➤</button>
-      <button id="voice-input-btn">🎤</button>
-    </div>
+
+      <!-- Sidebar Footer Auth Section -->
+      <div class="sidebar-footer" id="sidebar-footer">
+        <!-- Rendered Dynamically based on Authentication State -->
+      </div>
+    </aside>
+
+    <!-- Main Content Container -->
+    <main class="main-content">
+      <!-- Universal Top Header -->
+      <header class="header">
+        <div style="display: flex; align-items: center; gap: 15px;">
+          <button class="sidebar-toggle" id="sidebar-toggle-btn">
+            <i data-lucide="menu"></i>
+          </button>
+          <div class="header-center">
+            <h1 id="page-title">Eshika AI</h1>
+          </div>
+        </div>
+        <div class="header-right-actions">
+          <button id="theme-toggle" class="header-btn" title="Toggle Theme">
+            <i data-lucide="moon"></i>
+          </button>
+          <button id="quick-mute-btn" class="header-btn" title="Mute Speech">
+            <i data-lucide="volume-2"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- SPA Router View Container -->
+      <div class="page-container">
+        
+        <!-- ─── VIEW: HOME (Chat Console) ─── -->
+        <div class="page-view active" id="page-home">
+          <div class="chat-wrapper">
+            <main class="chat-area" id="chat-area">
+              <!-- Welcome Prompt Shown When History is Empty -->
+              <div class="welcome-chat-prompt" id="welcome-chat-prompt">
+                <img src="logo.png" alt="Eshika" class="welcome-logo" />
+                <h2>Eshika SmartBot AI</h2>
+                <p>Welcome! I'm Eshika, your advanced multilingual assistant. Type a message below, ask me a question, or talk to me using voice.</p>
+              </div>
+            </main>
+            <div id="typing-indicator" class="typing-indicator">Eshika is formulating a response...</div>
+            <div class="input-panel">
+              <textarea id="user-input" rows="1" placeholder="Ask me anything..."></textarea>
+              <button id="send-btn" title="Send message">
+                <i data-lucide="send"></i>
+              </button>
+              <button id="voice-input-btn" title="Voice dictation">
+                <i data-lucide="mic"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── VIEW: PROFILE ─── -->
+        <div class="page-view" id="page-profile">
+          <h2 class="page-header-title">My Profile</h2>
+          <p class="page-subtitle">Personalize your identity and monitor chat metrics.</p>
+          
+          <div class="profile-card">
+            <div class="profile-avatar-row">
+              <div class="profile-avatar-big" id="profile-avatar-big">U</div>
+              <div class="profile-main-info">
+                <h3 id="profile-display-name">Guest User</h3>
+                <p id="profile-display-email">Not logged in (Local Mode)</p>
+              </div>
+            </div>
+
+            <div class="profile-form-grid">
+              <div class="form-group">
+                <label for="profile-name-input">Display Name / Nickname</label>
+                <input type="text" id="profile-name-input" class="form-input" placeholder="Enter your nickname" />
+              </div>
+              <button class="btn-primary" id="save-profile-btn">
+                <i data-lucide="save" style="width:16px; height:16px; display:inline-block; vertical-align:middle; margin-right:4px;"></i> Save Preferences
+              </button>
+            </div>
+
+            <div class="stats-grid">
+              <div class="stat-box">
+                <div class="stat-val" id="stat-chats-count">0</div>
+                <div class="stat-lbl">Chat Sessions</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val" id="stat-messages-count">0</div>
+                <div class="stat-lbl">Total Interactions</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── VIEW: SETTINGS ─── -->
+        <div class="page-view" id="page-settings">
+          <h2 class="page-header-title">Settings</h2>
+          <p class="page-subtitle">Control language preference, voices, themes, and workspace storage.</p>
+          
+          <div class="settings-container">
+            <div class="settings-card">
+              <div class="settings-section-title">
+                <i data-lucide="globe" style="width:18px; height:18px;"></i> Language & Synthesis
+              </div>
+              
+              <div class="setting-row">
+                <div class="setting-row-info">
+                  <h4>Preferred Language</h4>
+                  <p>Changes Eshika's voice output accent and default grammar system.</p>
+                </div>
+                <div class="setting-control">
+                  <select id="language-select" class="select-control">
+                    <option value="en-US">English</option>
+                    <option value="te-IN">Telugu (తెలుగు)</option>
+                    <option value="hi-IN">Hindi (हिन्दी)</option>
+                    <option value="ta-IN">Tamil (தமிழ்)</option>
+                    <option value="kn-IN">Kannada (ಕನ್ನಡ)</option>
+                    <option value="ml-IN">Malayalam (മലയാളം)</option>
+                    <option value="bn-IN">Bengali (বাংলা)</option>
+                    <option value="mr-IN">Marathi (మరాठी)</option>
+                    <option value="gu-IN">Gujarati (గుજરાતી)</option>
+                    <option value="pa-IN">Punjabi (ਪੰਜਾਬੀ)</option>
+                    <option value="ur-PK">Urdu (اردو)</option>
+                    <option value="fr-FR">French (Français)</option>
+                    <option value="es-ES">Spanish (Español)</option>
+                    <option value="de-DE">German (Deutsch)</option>
+                    <option value="it-IT">Italian (Italiano)</option>
+                    <option value="pt-BR">Portuguese (Português)</option>
+                    <option value="ru-RU">Russian (Русский)</option>
+                    <option value="zh-CN">Chinese (简体中文)</option>
+                    <option value="ja-JP">Japanese (日本語)</option>
+                    <option value="ko-KR">Korean (한국어)</option>
+                    <option value="ar-SA">Arabic (العربية)</option>
+                    <option value="tr-TR">Turkish (Türkçe)</option>
+                    <option value="vi-VN">Vietnamese (Tiếng Việt)</option>
+                    <option value="th-TH">Thai (ไทย)</option>
+                    <option value="id-ID">Indonesian (Bahasa Indonesia)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="setting-row">
+                <div class="setting-row-info">
+                  <h4>Voice Synthesis Profile</h4>
+                  <p>Select preferred synthesized voice profile.</p>
+                </div>
+                <div class="setting-control">
+                  <select id="voice-select" class="select-control">
+                    <option value="female">Female</option>
+                    <option value="male">Male</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-card">
+              <div class="settings-section-title">
+                <i data-lucide="palette" style="width:18px; height:18px;"></i> Appearance & Sounds
+              </div>
+
+              <div class="setting-row">
+                <div class="setting-row-info">
+                  <h4>Light Mode</h4>
+                  <p>Toggle between professional light mode and modern default dark mode.</p>
+                </div>
+                <div>
+                  <label class="switch">
+                    <input type="checkbox" id="theme-switch" />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="setting-row">
+                <div class="setting-row-info">
+                  <h4>Voice Response (Speech)</h4>
+                  <p>Enable or disable speech synthesis readback.</p>
+                </div>
+                <div>
+                  <label class="switch">
+                    <input type="checkbox" id="speech-switch" checked />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-card">
+              <div class="settings-section-title">
+                <i data-lucide="shield-alert" style="width:18px; height:18px;"></i> Data & Reset
+              </div>
+              <div class="setting-row">
+                <div class="setting-row-info">
+                  <h4>Purge Chat Sessions & Cache</h4>
+                  <p>Irreversibly delete all local histories and custom preference memory.</p>
+                </div>
+                <button class="btn-danger" id="clear-all-data-btn">Purge Local Data</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── VIEW: ABOUT (Founder bios) ─── -->
+        <div class="page-view" id="page-about">
+          <h2 class="page-header-title">About Eshika SmartBot & Founders</h2>
+          <p class="page-subtitle">Learn about our visionaries, developers, and founders behind Eshika IT Solutions.</p>
+          
+          <div class="about-grid">
+            <!-- Biography Card: N Rishikumar -->
+            <div class="about-card">
+              <div class="founder-avatar-wrapper">
+                <img src="rishi.png" alt="N Rishikumar" class="founder-img" />
+                <span class="badge-glow">Founder</span>
+              </div>
+              <h3>N Rishikumar</h3>
+              <div class="founder-tag">Founder of Eshika SmartBot</div>
+              <div class="founder-details">
+                <p><strong>CTO at Eshika Training & Placements</strong></p>
+                <p>Son of N Chiranjeevi</p>
+              </div>
+              <p class="bio">
+                Designed and engineered the core architecture of **Eshika SmartBot**, incorporating advanced conversational artificial intelligence and seamless voice systems to create a highly friendly, human-like, and multilingual companion. Expert in Fullstack Development, AI Systems Engineering, and premium UI/UX interfaces.
+              </p>
+              <div class="founder-socials">
+                <a href="https://rishiriderportfolio.netlify.app/" target="_blank" class="social-link">
+                  <i data-lucide="globe" style="width:14px; height:14px;"></i> Portfolio
+                </a>
+                <a href="https://wa.me/916281919034" target="_blank" class="social-link">
+                  <i data-lucide="message-circle" style="width:14px; height:14px;"></i> WhatsApp
+                </a>
+              </div>
+            </div>
+
+            <!-- Biography Card: P Raghu Varma -->
+            <div class="about-card">
+              <div class="founder-avatar-wrapper">
+                <img src="praghu.webp" alt="P Raghu Varma" class="founder-img" />
+                <span class="badge-glow">Founder</span>
+              </div>
+              <h3>P Raghu Varma</h3>
+              <div class="founder-tag">Founder of Eshika IT Solutions</div>
+              <div class="founder-details">
+                <p><strong>CEO & Founder of Eshika Training & Placements</strong></p>
+                <p>Placement & Education Strategist</p>
+              </div>
+              <p class="bio">
+                A visionary entrepreneur and leader driving the next generation of technical learners. Building powerful educational platforms and placement ecosystems that seamlessly bridge the gap between academic graduation and high-impact global careers at **Eshika IT Solutions & Placements**.
+              </p>
+              <div class="founder-socials">
+                <a href="https://eshika.in" target="_blank" class="social-link">
+                  <i data-lucide="briefcase" style="width:14px; height:14px;"></i> Eshika Placements
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── VIEW: AUTHENTICATION ─── -->
+        <div class="page-view" id="page-auth">
+          <div class="auth-container">
+            <div class="auth-card">
+              <div class="auth-tabs">
+                <div class="auth-tab active" id="tab-login-btn">Login</div>
+                <div class="auth-tab" id="tab-signup-btn">Signup</div>
+              </div>
+
+              <!-- LOGIN FORM -->
+              <form class="auth-form active" id="auth-login-form" onsubmit="event.preventDefault();">
+                <div class="auth-title-row">
+                  <h3>Welcome Back</h3>
+                  <p>Login to your account using email and password</p>
+                </div>
+                <div class="auth-error" id="login-error-box">Invalid credentials</div>
+                <div class="form-group">
+                  <label for="login-email">Email Address</label>
+                  <input type="email" id="login-email" class="form-input" placeholder="name@example.com" required />
+                </div>
+                <div class="form-group">
+                  <label for="login-password">Password</label>
+                  <input type="password" id="login-password" class="form-input" placeholder="••••••••" required />
+                </div>
+                <button type="submit" class="btn-primary" id="submit-login-btn">Log In</button>
+              </form>
+
+              <!-- SIGNUP FORM -->
+              <form class="auth-form" id="auth-signup-form" onsubmit="event.preventDefault();">
+                <div class="auth-title-row">
+                  <h3>Create Account</h3>
+                  <p>Get started with a free account (no verification required)</p>
+                </div>
+                <div class="auth-error" id="signup-error-box">Account already exists</div>
+                <div class="form-group">
+                  <label for="signup-email">Email Address</label>
+                  <input type="email" id="signup-email" class="form-input" placeholder="name@example.com" required />
+                </div>
+                <div class="form-group">
+                  <label for="signup-password">Password</label>
+                  <input type="password" id="signup-password" class="form-input" placeholder="••••••••" required />
+                </div>
+                <button type="submit" class="btn-primary" id="submit-signup-btn">Sign Up</button>
+              </form>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
   </div>
+
   <script src="script.js"></script>
 </body>
 
